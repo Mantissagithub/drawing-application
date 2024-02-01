@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AppBar, Toolbar, Typography, Button, Menu, MenuItem } from '@mui/material';
 
 function Appbar() {
   const [menuAnchor, setMenuAnchor] = useState(null);
@@ -20,27 +19,22 @@ function Appbar() {
   };
 
   return (
-    <AppBar position="static" color="primary">
-      <Toolbar>
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          onClick={handleMenuOpen}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    <AppBar position="static" color="primary" sx={{ boxShadow: 'none', borderBottom: '1px solid #ccc' }}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h6" component="div">
           Drawing App
         </Typography>
-        <Button color="inherit" onClick={() => handleMenuItemClick('Gallery')}>
-          Gallery
-        </Button>
-        <Button color="inherit" onClick={() => handleMenuItemClick('Settings')}>
-          Settings
-        </Button>
-
-        {/* Add more buttons or components as needed */}
+        <div>
+          <Button color="inherit" onClick={() => handleMenuItemClick('Gallery')}>
+            Gallery
+          </Button>
+          <Button color="inherit" onClick={() => handleMenuItemClick('Settings')}>
+            Settings
+          </Button>
+          <Button color="inherit" onClick={handleMenuOpen}>
+            Open Menu
+          </Button>
+        </div>
       </Toolbar>
 
       {/* Menu component */}
