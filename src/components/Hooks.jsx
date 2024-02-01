@@ -2,89 +2,57 @@ import { useEffect, useRef } from "react";
 
 export function useOnDraw(onDrawCallback) {
   const canvasRef = useRef(null);
-
   const isDrawingRef = useRef(false);
-
-  const mouseMoveListenerRef = useRef(null);
-  const mouseDownListenerRef = useRef(null);
-  const mouseUpListenerRef = useRef(null);
-
   const prevPointRef = useRef(null);
 
   useEffect(() => {
-    return () => {
-      if (mouseMoveListenerRef.current) {
-        canvasRef.current.removeEventListener(
-          "mousemove",
-          mouseMoveListenerRef.current
-        );
-      }
-      if (mouseUpListenerRef.current) {
-        canvasRef.current.removeEventListener(
-          "mouseup",
-          mouseUpListenerRef.current
-        );
-      }
-    };
-  }, []);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  function setCanvasRef(ref) {
-    if (!ref) return;
-    if (canvasRef.current) {
-      canvasRef.current.removeEventListener(
-        "mousedown",
-        mouseDownListenerRef.current
-      );
-    }
-    canvasRef.current = ref;
-    if(canvasRef.current){
-        initMouseMoveListener();
-    initMouseDownListener();
-    initMouseUpListener();
-    }
-  }
+    const ctx = canvas.getContext("2d");
 
-  function initMouseMoveListener() {
     const mouseMoveListener = (e) => {
       if (isDrawingRef.current) {
         const point = computePointInCanvas(e.clientX, e.clientY);
-        const ctx = canvasRef.current.getContext("2d");
-        if (onDrawCallback) onDrawCallback(ctx, point,prevPointRef.current);
+        if (onDrawCallback) onDrawCallback(ctx, point, prevPointRef.current);
+        prevPointRef.current = point;
       }
     };
-    mouseMoveListenerRef.current = mouseMoveListener;
-    canvasRef.current.addEventListener("mousemove", mouseMoveListener);
-  }
 
-  function initMouseDownListener() {
-    if (!canvasRef.current) return;
-    const listener = () => {
+    const mouseDownListener = () => {
       isDrawingRef.current = true;
+      prevPointRef.current = null;  // Reset prevPoint when the mouse is pressed
     };
-    mouseDownListenerRef.current = listener;
-    canvasRef.current.addEventListener("mousedown", listener);
-  }
 
-  function initMouseUpListener() {
-    const listener = () => {
+    const mouseUpListener = () => {
       isDrawingRef.current = false;
       prevPointRef.current = null;
     };
-    mouseUpListenerRef.current = listener;
-    canvasRef.current.addEventListener("mouseup", listener);
-  }
+
+    canvas.addEventListener("mousemove", mouseMoveListener);
+    canvas.addEventListener("mousedown", mouseDownListener);
+    canvas.addEventListener("mouseup", mouseUpListener);
+
+    return () => {
+      canvas.removeEventListener("mousemove", mouseMoveListener);
+      canvas.removeEventListener("mousedown", mouseDownListener);
+      canvas.removeEventListener("mouseup", mouseUpListener);
+    };
+  }, [onDrawCallback]);
 
   function computePointInCanvas(clientX, clientY) {
-    if (canvasRef.current) {
-      const boundingRect = canvasRef.current.getBoundingClientRect();
-      return {
-        x: clientX - boundingRect.left,
-        y: clientY - boundingRect.top,
-      };
-    } else {
-      return null;
-    }
+    const boundingRect = canvasRef.current.getBoundingClientRect();
+    return {
+      x: clientX - boundingRect.left,
+      y: clientY - boundingRect.top,
+    };
   }
 
-  return setCanvasRef;
+  return (ref) => {
+    if (ref) {
+      canvasRef.current = ref;
+      ref.width = ref.clientWidth;   // Set canvas width explicitly
+      ref.height = ref.clientHeight; // Set canvas height explicitly
+    }
+  };
 }
