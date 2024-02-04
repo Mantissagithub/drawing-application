@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem } from '@mui/material';
+import ShapeSelector from './shapeSelector'; // Corrected the import statement
 
-function Appbar() {
+function Appbar({ currentShape, setCurrentShape }) { // Pass currentShape and setCurrentShape as props
   const [menuAnchor, setMenuAnchor] = useState(null);
 
   const handleMenuOpen = (event) => {
@@ -31,9 +32,8 @@ function Appbar() {
           <Button color="inherit" onClick={() => handleMenuItemClick('Settings')}>
             Settings
           </Button>
-          <Button color="inherit" onClick={handleMenuOpen}>
-            Open Menu
-          </Button>
+          {/* Include the ShapeSelector component with necessary props */}
+          <ShapeSelector currentShape={currentShape} setCurrentShape={setCurrentShape} />
         </div>
       </Toolbar>
 

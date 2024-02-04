@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useOnDraw(onDrawCallback) {
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);
   const prevPointRef = useRef(null);
+  const [currentShape, setCurrentShape] = useState("line");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,7 +39,7 @@ export function useOnDraw(onDrawCallback) {
       canvas.removeEventListener("mousedown", mouseDownListener);
       canvas.removeEventListener("mouseup", mouseUpListener);
     };
-  }, [onDrawCallback]);
+  }, [onDrawCallback, setCurrentShape]);
 
   function computePointInCanvas(clientX, clientY) {
     const boundingRect = canvasRef.current.getBoundingClientRect();
@@ -48,11 +49,12 @@ export function useOnDraw(onDrawCallback) {
     };
   }
 
-  return (ref) => {
+  return {
+    setCanvasRef: (ref) => {
     if (ref) {
       canvasRef.current = ref;
       ref.width = ref.clientWidth;   // Set canvas width explicitly
       ref.height = ref.clientHeight; // Set canvas height explicitly
     }
-  };
+  }, setCurrentShape};
 }
